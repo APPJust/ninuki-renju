@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f6efe1">
+    <meta name="description" content="第 27 題夾吃五子棋：早餐店主題的雙人同機或跨瀏覽器棋盤遊戲。">
+    <title>夾吃五子棋｜早餐店棋盤</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script type="module" src="ui.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-mark" aria-hidden="true"><span>早</span></div>
+        <div class="brand-name">
+          <strong>晨光早餐店</strong>
+          <span>棋盤對戰時間</span>
+        </div>
+        <div class="question-tag">第 27 題</div>
+      </header>
+
+      <main>
+        <section id="home-screen" class="screen home-screen" aria-labelledby="home-title">
+          <div class="hero-card">
+            <div class="hero-stamp"><span class="stamp-sun" aria-hidden="true"></span> 早餐店限定・雙人對弈</div>
+            <h1 id="home-title">夾吃五子棋</h1>
+            <p class="hero-copy">先連成五子，或把對手的豆漿／咖啡夾走五對，今天這盤就算你贏。</p>
+
+            <div class="drink-pair" aria-label="黑方使用黑咖啡，白方使用豆漿">
+              <div class="drink-card coffee-card">
+                <span class="drink-stone coffee-stone" aria-hidden="true"></span>
+                <span class="drink-name">黑咖啡</span>
+                <span class="drink-role">黑方・先手</span>
+              </div>
+              <span class="versus" aria-hidden="true">對</span>
+              <div class="drink-card soy-card">
+                <span class="drink-stone soy-stone" aria-hidden="true"></span>
+                <span class="drink-name">豆漿</span>
+                <span class="drink-role">白方・後手</span>
+              </div>
+            </div>
+
+            <button id="start-game" class="primary-button" type="button">
+              <span>開始同一台練習</span><span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+            <p class="hero-footnote">兩位玩家輪流使用同一個畫面，黑咖啡先下。</p>
+
+            <div class="online-card">
+              <div class="online-card-heading">
+                <div class="section-kicker"><span></span> 跨裝置對戰</div>
+                <p>和另一台瀏覽器連線，只會交換暱稱與棋局資料。</p>
+              </div>
+              <label class="field-label" for="nickname-input">這局使用的暱稱</label>
+              <input id="nickname-input" class="text-input nickname-input" type="text" maxlength="16" autocomplete="nickname" value="早餐店客人" placeholder="輸入暱稱">
+              <div class="network-actions">
+                <button id="host-room" class="secondary-button" type="button">開房</button>
+                <div class="join-controls">
+                  <input id="room-code-input" class="text-input room-code-input" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="房間代碼" aria-label="輸入四碼房間代碼">
+                  <button id="join-room" class="secondary-button join-button" type="button">加入</button>
+                </div>
+              </div>
+              <p id="home-network-notice" class="home-network-notice" role="status" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="rules-card">
+            <div class="section-kicker"><span></span> 店長小黑板</div>
+            <h2>簡單三步，夾出勝利</h2>
+            <ol class="rule-list">
+              <li><span class="rule-number">01</span><span>在 13×13 交叉點落子，黑咖啡先下。</span></li>
+              <li><span class="rule-number">02</span><span>橫、直、斜都能夾；多方向可同時提。自己被夾不會被提。</span></li>
+              <li><span class="rule-number">03</span><span>連成五子以上或提走五對獲勝；滿盤無人獲勝就是和局。</span></li>
+            </ol>
+          </div>
+
+          <footer class="site-footer">
+            <span>資通系 李振偉老師</span>
+            <a class="source-link" href="#" aria-label="原始碼（網址之後補上）" title="原始碼網址之後補上">原始碼 ↗</a>
+          </footer>
+        </section>
+
+        <section id="game-screen" class="screen game-screen" aria-labelledby="game-title" hidden>
+          <div class="game-toolbar">
+            <button id="back-home" class="quiet-button" type="button"><span aria-hidden="true">←</span> 首頁</button>
+            <div id="round-label" class="round-label">同一台練習</div>
+            <button id="restart-game" class="quiet-button restart-button" type="button"><span aria-hidden="true">↻</span> 重開</button>
+          </div>
+
+          <div class="game-intro">
+            <div>
+              <div class="section-kicker"><span></span> 早餐店棋盤</div>
+              <h1 id="game-title">輪流落子，<em>夾吃得分。</em></h1>
+            </div>
+            <p class="board-caption">13 × 13<br>橫・直・斜都能夾</p>
+          </div>
+
+          <div class="scoreboard" aria-label="雙方提子數">
+            <article id="black-card" class="player-card black-card active">
+              <span class="mini-stone coffee-stone" aria-hidden="true"></span>
+              <div class="player-info">
+                <strong id="black-player-name">黑咖啡</strong>
+                <span id="black-player-role">黑方・先手</span>
+              </div>
+              <div class="capture-info">
+                <strong id="black-captures">0 對</strong>
+                <span id="black-captured-stones">提走 0 顆豆漿</span>
+              </div>
+            </article>
+            <article id="white-card" class="player-card white-card">
+              <span class="mini-stone soy-stone" aria-hidden="true"></span>
+              <div class="player-info">
+                <strong id="white-player-name">豆漿</strong>
+                <span id="white-player-role">白方・後手</span>
+              </div>
+              <div class="capture-info">
+                <strong id="white-captures">0 對</strong>
+                <span id="white-captured-stones">提走 0 顆黑咖啡</span>
+              </div>
+            </article>
+          </div>
+
+          <div id="turn-banner" class="turn-banner" role="status" aria-live="polite">
+            <span class="turn-dot coffee-stone" aria-hidden="true"></span>
+            <span id="turn-label">輪到黑咖啡</span>
+            <span class="turn-hint">點選一個交叉點</span>
+          </div>
+
+          <div class="board-wrap">
+            <div id="board" class="board-surface" role="group" aria-label="13 乘 13 夾吃五子棋棋盤"></div>
+          </div>
+          <p id="game-notice" class="game-notice" role="status" aria-live="polite">黑咖啡先下，想辦法連成五子或夾走五對。</p>
+
+          <footer class="site-footer">
+            <span>資通系 李振偉老師</span>
+            <a class="source-link" href="#" aria-label="原始碼（網址之後補上）" title="原始碼網址之後補上">原始碼 ↗</a>
+          </footer>
+        </section>
+
+        <section id="lobby-screen" class="screen lobby-screen" aria-labelledby="lobby-title" hidden>
+          <div class="game-toolbar">
+            <button id="lobby-home" class="quiet-button" type="button"><span aria-hidden="true">←</span> 回首頁</button>
+            <div class="round-label">PeerJS 連線大廳</div>
+            <span class="toolbar-spacer" aria-hidden="true"></span>
+          </div>
+          <div class="lobby-card">
+            <div class="lobby-emblem" aria-hidden="true"><span></span><span></span></div>
+            <div class="section-kicker"><span></span> 早餐店線上棋桌</div>
+            <h1 id="lobby-title">等待對手加入</h1>
+            <p id="lobby-status" class="lobby-status" role="status" aria-live="polite">正在連接 PeerJS…</p>
+            <div id="host-room-details" class="room-details" hidden>
+              <span class="field-label">四碼房間代碼</span>
+              <strong id="room-code-view" class="room-code-view"></strong>
+              <label class="field-label invite-label" for="invite-link">邀請連結</label>
+              <div class="invite-row">
+                <input id="invite-link" class="text-input invite-input" type="text" readonly>
+                <button id="copy-invite" class="secondary-button copy-button" type="button">複製</button>
+              </div>
+              <p class="room-help">把連結傳給對手；開啟後會自動加入這一局。</p>
+            </div>
+            <div id="join-room-details" class="join-room-details" hidden>
+              <span>正在加入房間</span>
+              <strong id="joining-room-code" class="room-code-view"></strong>
+            </div>
+          </div>
+          <footer class="site-footer">
+            <span>資通系 李振偉老師</span>
+            <a class="source-link" href="#" aria-label="原始碼（網址之後補上）" title="原始碼網址之後補上">原始碼 ↗</a>
+          </footer>
+        </section>
+
+        <section id="offline-screen" class="screen offline-screen" aria-labelledby="offline-title" hidden>
+          <div class="offline-card">
+            <div class="offline-icon" aria-hidden="true">×</div>
+            <div class="section-kicker"><span></span> 連線中斷</div>
+            <h1 id="offline-title">對手已離線</h1>
+            <p id="offline-detail">這一局的棋盤已停止更新。</p>
+            <button id="offline-home" class="primary-button" type="button">回首頁</button>
+          </div>
+          <footer class="site-footer">
+            <span>資通系 李振偉老師</span>
+            <a class="source-link" href="#" aria-label="原始碼（網址之後補上）" title="原始碼網址之後補上">原始碼 ↗</a>
+          </footer>
+        </section>
+      </main>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    </div>
+  </body>
+</html>
