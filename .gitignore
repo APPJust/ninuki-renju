@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.vinext/
+.next/
+.wrangler/
+.npm-cache/
+.env*
+!.env.example
+artifacts/
