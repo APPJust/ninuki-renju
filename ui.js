@@ -522,13 +522,6 @@ boardElement.addEventListener("click", async event => {
   handleLocalMove(row, col);
 });
 
-document.querySelectorAll(".source-link").forEach(link => {
-  link.addEventListener("click", event => {
-    event.preventDefault();
-    showToast("原始碼連結網址之後補上。");
-  });
-});
-
 const roomFromUrl = new URLSearchParams(window.location.search).get("room");
 if (roomFromUrl) {
   const code = roomFromUrl.trim().toUpperCase();

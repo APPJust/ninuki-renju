@@ -4,6 +4,8 @@
 
 - **遊戲名稱：** 第 27 題〈夾吃五子棋〉
 - **作者：** 資通系 李振偉老師
+- **GitHub Pages：** https://appjust.github.io/ninuki-renju/
+- **原始碼：** https://github.com/APPJust/ninuki-renju
 - **棋子：** 黑方是黑咖啡，白方是豆漿
 - **PeerJS：** 1.5.5
 
@@ -39,6 +41,8 @@
 
 房間代碼為四碼大寫英文字母/數字（排除容易混淆的 `0`、`O`、`1`、`I`），PeerJS ID 格式是 `jit1151-27-房間代碼`。PeerJS 伺服器用於訊號媒合；雙方連線建立後，棋局資料透過 WebRTC 資料通道互傳。
 
+連線只交換暱稱、棋盤狀態與連線/回合控制欄位，不傳送學號或真實姓名。
+
 ## 連線訊息格式
 
 所有訊息都有 `type` 欄位，以 JSON 字串透過 PeerJS 資料通道傳送。範例中的時間戳為毫秒。
@@ -47,7 +51,7 @@
 |---|---|---|---|
 | `hello` | 雙方互送 | `role`、`nickname`、`round`；開房方另含 `hostColor` | 加入方：`{"type":"hello","role":"guest","nickname":"豆漿","round":1}`<br>開房方：`{"type":"hello","role":"host","nickname":"黑咖啡","hostColor":"black","round":1}` |
 | `move` | 加入方 → 開房方 | `actor`（固定為 `"guest"`）、`row`、`col`（0–12） | `{"type":"move","actor":"guest","row":6,"col":7}` |
-| `state` | 開房方 → 加入方 | `state`、`outcome`、`captured`、`round`、`hostColor`、`hostNickname`、`guestNickname`、`restarted` | 完整封包範例見下方。 |
+| `state` | 開房方 → 加入方 | `state`（`board`、`currentPlayer`、`capturedPairs`、`moveCount`、`lastMove`）、`outcome`（`finished`、`winner`、`draw`、`reasons`、`message`）、`captured`（`{row,col,color}` 陣列）、`round`、`hostColor`、`hostNickname`、`guestNickname`、`restarted` | 完整封包範例見下方。 |
 | `reject` | 開房方 → 加入方 | `reason`（中文原因） | `{"type":"reject","reason":"現在還不是你的回合。"}` |
 | `restart` | 加入方 → 開房方；開房方 → 加入方 | 加入方請求含 `ready`；開房方狀態含 `hostReady`、`guestReady` | 請求：`{"type":"restart","ready":true}`<br>狀態：`{"type":"restart","hostReady":true,"guestReady":false}` |
 | `ping` | 雙方互送 | `at`（送出時間，Unix 毫秒） | `{"type":"ping","at":1760000000000}` |
